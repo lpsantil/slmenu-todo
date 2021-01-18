@@ -1,5 +1,5 @@
 # slmenu-todo
-A fork suckless' dmenu todo for use with slmenu
+A fork of suckless' dmenu todo for use with slmenu
 
 ## References
 * [suckless dmenu][0]
