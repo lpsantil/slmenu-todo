@@ -1,0 +1,33 @@
+#!/bin/sh
+#
+# Write/remove a task to do later.
+#
+# Select an existing entry to remove it from the file, or type a new entry to
+# add it.
+#
+
+#file="$HOME/.todo"
+file="./.todo"
+touch "$file"
+height=$(wc -l "$file" | awk '{print $1+1}')
+height=$([ $height -gt 20 ]
+prompt="Add/delete a task: "
+pre=""
+
+cmd=$(./slmenu -t -l "$height" -p "$prompt" "$@" < "$file")
+while [ -n "$cmd" ]; do
+ 	if grep -q "^$cmd\$" "$file"; then
+		grep -v "^$cmd\$" "$file" > "$file.$$"
+		mv "$file.$$" "$file"
+		pre="Deleted: $cmd"
+        height=$(( height - 1 ))
+ 	else
+		echo "$cmd" >> "$file"
+		pre="Added: $cmd"
+		height=$(( height + 1 ))
+ 	fi
+
+	cmd=$(./slmenu -t -l "$height" -p "$pre ~ $prompt" "$@" < "$file")
+done
+
+exit 0
