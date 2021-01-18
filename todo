@@ -6,28 +6,38 @@
 # add it.
 #
 
+
+(which slmenu >/dev/null) || (echo "slmenu not found in \$PATH" ; exit 1)
+
 #file="$HOME/.todo"
 file="./.todo"
 touch "$file"
 height=$(wc -l "$file" | awk '{print $1+1}')
-height=$([ $height -gt 20 ]
+height=$(( $height > 20 ? 20 : $height ))
 prompt="Add/delete a task: "
 pre=""
+clear
 
-cmd=$(./slmenu -t -l "$height" -p "$prompt" "$@" < "$file")
+# Display first prompt
+cmd=$(slmenu -t -l "$height" -p "$prompt" "$@" < "$file")
 while [ -n "$cmd" ]; do
  	if grep -q "^$cmd\$" "$file"; then
+	# Delete selected entry
 		grep -v "^$cmd\$" "$file" > "$file.$$"
 		mv "$file.$$" "$file"
 		pre="Deleted: $cmd"
-        height=$(( height - 1 ))
+		height=$(( height - 1 ))
  	else
+	# Add an entry from the prompt to the bottom
 		echo "$cmd" >> "$file"
 		pre="Added: $cmd"
 		height=$(( height + 1 ))
  	fi
 
-	cmd=$(./slmenu -t -l "$height" -p "$pre ~ $prompt" "$@" < "$file")
+	# Display last action and prompt for next input
+	# Hit ESC twice to quit
+	cmd=$(slmenu -t -l "$height" -p "$pre ~ $prompt" "$@" < "$file")
 done
 
+clear
 exit 0
